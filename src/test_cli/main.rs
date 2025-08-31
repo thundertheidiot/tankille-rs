@@ -1,4 +1,5 @@
-use std::env::{self, var};
+use anyhow::anyhow;
+use std::env::var;
 
 use anyhow::Result;
 
@@ -17,13 +18,16 @@ async fn main() -> Result<()> {
             &user,
             &pass,
         );
-        client.login(login).await?;
+
+	client.login(login).await?;
+    } else {
+	return Err(anyhow!("Supply either a refresh token as $TOKEN, or a $USERNAME and $PASSWORD"));
     }
 
     println!("{client:#?}");
 
-    // client.refresh_token().await?;
-    // println!("{client:#?}");
+    client.refresh_token().await?;
+    println!("{client:#?}");
 
     Ok(())
 }

@@ -1,11 +1,19 @@
+use crate::ApiError;
 use chrono::DateTime;
 use chrono::Utc;
-use reqwest::header::{CONTENT_TYPE, HeaderMap, HeaderValue, USER_AGENT};
-use reqwest::{ClientBuilder, RequestBuilder};
+use reqwest::header::{CONTENT_TYPE, HeaderMap, HeaderValue};
+use reqwest::ClientBuilder;
 use serde::{Deserialize, Serialize};
 
 use crate::Result;
 use crate::TankilleError;
+
+#[derive(Debug, Deserialize)]
+#[serde(untagged)]
+pub enum ApiResponse<T> {
+    Ok(T),
+    Err(ApiError)
+}
 
 #[derive(Debug)]
 pub struct Client {
@@ -109,8 +117,11 @@ impl Client {
                         .send()
                         .await?;
 
-                    let token: Response = response.json().await?;
-                    self.access_token = Some(token.access_token);
+		    let text = response.text().await?;
+		    dbg!(text);
+
+                    let token: ApiResponse<Response> = response.json().await?;
+                    self.access_token = Some(token?.access_token);
                     self.last_token_fetch = Some(Utc::now());
 
                     Ok(())
