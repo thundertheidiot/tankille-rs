@@ -1,0 +1,5 @@
+* Tankille API
+
+Will mostly be copied from this, i want to use this for a personal project that already uses rust.
+
+https://github.com/aattola/tankille
